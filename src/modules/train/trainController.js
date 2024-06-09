@@ -1,7 +1,16 @@
 const pool = require("../../config/db");
+const { findUserById } = require("../user/userQueries");
 const trainQueries=require('./trainQueries');
-const addTrain=(req,res)=>{
+const addTrain=async(req,res)=>{
     const {trainId,name ,source,destination,totalSeats}=req.body;
+    // const userId=req.user.userId;
+    // //check if the user adding the train is admin or not
+    // let user=await pool.query(findUserById,[userId]);
+    // user=user.rows[0];
+    // if(user.type!='admin'){
+    //     return res.status(400).send("this user is not admin so cannot add train");
+    // }
+    
     //first check if the train with this trainId exists or not
     pool.query(trainQueries.checkTrainExist, [trainId],(error,results)=>{
         if(error)return res.status(500).send(error.message);

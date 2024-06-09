@@ -1,4 +1,5 @@
 const pool=require('../../config/db');
+const { createAccessToken } = require('../../util/util');
 const userQueries=require('./userQueries')
 const getUsers=(req,res)=>{
     pool.query("SELECT * FROM users",(error,results)=>{
@@ -31,10 +32,13 @@ const addUser=(req,res)=>{
 
 const loginUser=(req,res)=>{
     const {email,password}=req.body;
-    pool.query(userQueries.loginUser,[email,password],(error,results)=>{
+    pool.query(userQueries.loginUser,[email,password],async (error,results)=>{
         if(error)return res.status(500).send(error.message);
-        const data=results.rows;
-        return res.status(200).send({data:data});
+        const data=results.rows[0];
+        const token=await createAccessToken(data.id);
+        return res.status(200).send({...data,
+            accessToken:token,
+        });
     })
 }
 
